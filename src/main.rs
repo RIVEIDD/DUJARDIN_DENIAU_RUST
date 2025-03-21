@@ -45,15 +45,15 @@ fn main() {
 
     let joueur1 = Joueur::new(
         &args.nom1,
-        rng.gen_range(50..=100),
-        rng.gen_range(30..=70),
-        rng.gen_range(20..=60),
+        rng.gen_range(0..=100),
+        rng.gen_range(0..=100),
+        rng.gen_range(0..=100),
     );
     let joueur2 = Joueur::new(
         &args.nom2,
-        rng.gen_range(50..=100),
-        rng.gen_range(30..=70),
-        rng.gen_range(20..=60),
+        rng.gen_range(0..=100),
+        rng.gen_range(0..=100),
+        rng.gen_range(0..=100),
     );
 
     println!("--- Joueur 1 ---");
