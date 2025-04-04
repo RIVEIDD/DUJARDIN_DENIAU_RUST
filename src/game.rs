@@ -1,8 +1,10 @@
-use std::{collections::HashMap, io, thread, time::Duration};
+use std::{io, thread, time::Duration};
 use crate::input::wait_for_key;
 use crate::objective::generate_objectives;
 use crate::player::Player;
 use crate::score::calculate_score;
+use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 /// Lance une partie complète entre deux joueurs
 pub fn start_game(player1: &mut Player, player2: &mut Player, n_objectives: usize) {
@@ -58,46 +60,51 @@ fn play_turn(player: &Player, n_objectives: usize) -> u32 {
         }
     }
 
-    let mut total_score = 0;
+    let compteur = Arc::new(Mutex::new(0));
+    let miss = Arc::new(Mutex::new(0));
+    let running = Arc::new(AtomicBool::new(true));
 
-    for (letter, target) in objectives {
-        let mut compteur = 0;
-        let mut miss = 0;
+    let c_clone = compteur.clone();
+    let m_clone = miss.clone();
+    let r_clone = running.clone();
+    let speed = player.speed;
 
-        // Compteur simulé
-        let speed = player.speed;
-        let handle = thread::spawn(move || {
-            loop {
-                thread::sleep(Duration::from_millis(speed));
-                compteur = (compteur + 1) % 101;
-                if compteur == 0 {
-                    miss += 1;
-                }
+    let handle = thread::spawn(move || {
+        while r_clone.load(Ordering::SeqCst) {
+            thread::sleep(Duration::from_millis(speed.into()));
+            let mut c = c_clone.lock().unwrap();
+            *c += 1;
+            if *c > 100 {
+                *c = 0;
+                let mut m = m_clone.lock().unwrap();
+                *m += 1;
             }
-            #[allow(unreachable_code)]
-            (compteur, miss)
-        });
-
-        let key_pressed = loop {
-            if let Some(c) = wait_for_key() {
-                break c;
-            }
-        };
-
-        let _ = handle.thread().unpark(); // Simule l'arrêt du thread
-        let (score, miss) = (compteur, miss); // À ajuster si le thread est contrôlé proprement
-
-        if key_pressed == letter {
-            let diff = crate::utils::circular_diff(score, target);
-            let point = calculate_score(diff, player.strength, miss);
-            println!("→ Objectif {}:{} : Miss = {} | Compteur = {} => Score = {}", letter, target, miss, score, point);
-            total_score += point;
-        } else {
-            println!("→ Mauvaise touche {} au lieu de {} : Score = 0", key_pressed, letter);
         }
+    });
+
+    let key_pressed = loop {
+        if let Some(c) = wait_for_key() {
+            break c;
+        }
+    };
+
+    running.store(false, Ordering::SeqCst);
+    handle.join().unwrap();
+
+    let score = *compteur.lock().unwrap();
+    let miss = *miss.lock().unwrap();
+
+    let (cible, valeur) = objectives.iter().next().unwrap();
+    if key_pressed == *cible {
+        let diff = crate::utils::circular_diff(score, *valeur);
+        let point = calculate_score(diff, player.strength, miss);
+        println!("→ Objectif {}:{} : Miss = {} | Compteur = {} => Score = {}", cible, valeur, miss, score, point);
+        return point;
+    } else {
+        println!("→ Mauvaise touche {} au lieu de {} : Score = 0", key_pressed, cible);
     }
 
-    let final_score = (total_score as f32 / n_objectives as f32).ceil() as u32;
+    let final_score = (0 as f32 / n_objectives as f32).ceil() as u32;
     println!("→ Score moyen {}", final_score);
     final_score
 }

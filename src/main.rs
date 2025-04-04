@@ -1,34 +1,3 @@
-// use rand::prelude::*;
-// use rand::distributions::Alphanumeric;
-
-// fn main() {
-//     println!("Hello, world!");
-
-//     // Get an RNG:
-//     let mut rng = rand::thread_rng();
-
-//     // Try printing a random unicode code point (may panic on invalid chars)
-//     println!("char: '{}'", rng.r#gen::<char>());
-
-//     // Try printing a random alphanumeric value instead!
-//     let c = rng.sample(Alphanumeric) as char;
-//     println!("alpha: '{}'", c);
-
-//     // Generate and shuffle a sequence:
-//     let mut nums: Vec<i32> = (1..100).collect();
-//     nums.shuffle(&mut rng);
-
-//     // And take a random pick:
-//     if let Some(pick) = nums.choose(&mut rng) {
-//         println!("random pick: {}", pick);
-//     }
-// }
-
-
-//! Point d'entrée principal du jeu de duel
-//! Utilise clap pour récupérer les arguments et initialise les joueurs
-//! Lance la boucle de jeu jusqu'à la victoire d'un joueur
-
 mod player;
 mod game;
 mod objective;
@@ -40,6 +9,8 @@ use clap::Parser;
 use player::Player;
 use game::start_game;
 
+/// Les objectifs sont générés sous forme de paires lettre:nombre (ex: 'a': 45).
+/// Le joueur doit appuyer sur la bonne touche au bon moment pour marquer des points.
 /// Représente les arguments CLI pour configurer la partie
 #[derive(Parser, Debug)]
 #[command(name = "Jeu de Duel", about = "Un mini-jeu de duel en ligne de commande")]
