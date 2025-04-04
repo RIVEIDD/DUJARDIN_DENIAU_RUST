@@ -115,3 +115,23 @@ impl Player {
         self.vitality > 0
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_player_creation() {
+        let player = Player::new("Alice", 50);
+        assert_eq!(player.name, "Alice");
+        assert_eq!(player.vitality, 50);
+    }
+
+    #[test]
+    fn test_apply_poison_force() {
+        let mut player = Player::new("Bob", 50);
+        player.strength = 20;
+        player.apply_poison(2); // Réduit la force
+        assert_eq!(player.strength, 15);
+    }
+}

@@ -11,3 +11,20 @@ pub fn calculate_score(diff: u32, force: u32, miss: u32) -> u32 {
 
     (base + force) / (miss + 1)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_score_exact() {
+        let score = calculate_score(0, 50, 0);
+        assert_eq!(score, 150); // (100 + 50) / (0 + 1)
+    }
+
+    #[test]
+    fn test_score_far() {
+        let score = calculate_score(30, 50, 2);
+        assert_eq!(score, (20 + 50) / 3); // (70 / 3) = 23
+    }
+}
