@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["main"],"mod":["game","input","objective","player","score","utils"],"struct":["Args"]};

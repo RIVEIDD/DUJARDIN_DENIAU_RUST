@@ -1,7 +1,7 @@
 use crossterm::event::{self, Event, KeyCode};
 use std::time::Duration;
 
-/// Attend que l'utilisateur appuie sur une touche et retourne-la
+/// Attend que l'utilisateur appuie sur une touche et la retourne
 pub fn wait_for_key() -> Option<char> {
     loop {
         if event::poll(Duration::from_millis(10)).unwrap() {

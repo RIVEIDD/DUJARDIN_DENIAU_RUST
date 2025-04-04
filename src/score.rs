@@ -1,3 +1,4 @@
+/// Calcule le score à partir de la différence avec l’objectif, de la force et du nombre de ratés.
 pub fn calculate_score(diff: u32, force: u32, miss: u32) -> u32 {
     let base = match diff {
         0 => 100,

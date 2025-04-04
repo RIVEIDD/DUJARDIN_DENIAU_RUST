@@ -14,6 +14,7 @@ use game::start_game;
 /// Représente les arguments CLI pour configurer la partie
 #[derive(Parser, Debug)]
 #[command(name = "Jeu de Duel", about = "Un mini-jeu de duel en ligne de commande")]
+/// Représente les arguments en ligne de commande (noms, vitalité, objectifs).
 struct Args {
     /// Nom du joueur 1
     #[arg(long, default_value = "Joueur1")]
@@ -31,7 +32,7 @@ struct Args {
     #[arg(long, default_value_t = 5)]
     objectifs: usize,
 }
-
+/// Fonction principale : initialise les joueurs et démarre la partie.
 fn main() {
     let args = Args::parse();
 

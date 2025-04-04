@@ -68,6 +68,7 @@
 //! Module représentant un joueur dans le jeu
 //! Contient les statistiques, méthodes d’affichage et de mise à jour
 
+/// Structure représentant un joueur avec son nom, vitalité, vitesse et force.
 pub struct Player {
     pub name: String,
     pub vitality: i32,
@@ -76,6 +77,7 @@ pub struct Player {
 }
 
 impl Player {
+    /// Crée un joueur avec un nom et une vitalité initiale.
     pub fn new(name: &str, vitality: u32) -> Self {
         Self {
             name: name.to_string(),
@@ -85,10 +87,12 @@ impl Player {
         }
     }
 
+    /// Affiche les caractéristiques du joueur dans le terminal.
     pub fn display_stats(&self) {
         println!("Au tour de {} (Vitality={}, Speed={}, Strength={})", self.name, self.vitality, self.speed, self.strength);
     }
 
+    /// Applique un poison au joueur (réduit sa vitesse ou sa force).
     pub fn apply_poison(&mut self, choice: u8) {
         match choice {
             1 => {

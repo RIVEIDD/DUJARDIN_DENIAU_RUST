@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["play_turn","poison_choice","start_game"]};

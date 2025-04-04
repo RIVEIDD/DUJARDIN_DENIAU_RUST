@@ -6,7 +6,7 @@ use crate::score::calculate_score;
 use std::sync::{Arc, Mutex};
 use std::sync::atomic::{AtomicBool, Ordering};
 
-/// Lance une partie complète entre deux joueurs
+/// Lance la partie entre deux joueurs jusqu’à ce que l’un perde toute sa vitalité.
 pub fn start_game(player1: &mut Player, player2: &mut Player, n_objectives: usize) {
     let mut round = 1;
 
@@ -48,6 +48,7 @@ fn poison_choice(winner: &Player, loser: &mut Player) {
     loser.apply_poison(choice);
 }
 
+/// Effectue un tour de jeu : génère les objectifs, mesure le temps de réaction et calcule le score.
 fn play_turn(player: &Player, n_objectives: usize) -> u32 {
     player.display_stats();
     let objectives = generate_objectives(n_objectives);
