@@ -109,7 +109,53 @@
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
 <a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::{io, thread, time::Duration};
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::{io, thread, time::Duration};
 <span class="kw">use </span><span class="kw">crate</span>::input::wait_for_key;
 <span class="kw">use </span><span class="kw">crate</span>::objective::generate_objectives;
 <span class="kw">use </span><span class="kw">crate</span>::player::Player;
@@ -124,21 +170,25 @@
     <span class="kw">loop </span>{
         <span class="macro">println!</span>(<span class="string">"## Manche {} ##"</span>, round);
 
-        <span class="kw">let </span>score1 = play_turn(player1, n_objectives);
-        <span class="kw">let </span>score2 = play_turn(player2, n_objectives);
+        <span class="kw">let </span>score1 = play_turn(player1, n_objectives).unwrap_or(<span class="number">0</span>);
+        <span class="kw">let </span>score2 = play_turn(player2, n_objectives).unwrap_or(<span class="number">0</span>);
 
-        <span class="kw">if </span>score1 &gt; score2 {
-            <span class="kw">let </span>diff = score1 - score2;
-            player2.vitality -= diff <span class="kw">as </span>i32;
-            <span class="macro">println!</span>(<span class="string">"{} gagne la manche. {} perd {} points de vitalité."</span>, player1.name, player2.name, diff);
-            poison_choice(player1, player2);
-        } <span class="kw">else if </span>score2 &gt; score1 {
-            <span class="kw">let </span>diff = score2 - score1;
-            player1.vitality -= diff <span class="kw">as </span>i32;
-            <span class="macro">println!</span>(<span class="string">"{} gagne la manche. {} perd {} points de vitalité."</span>, player2.name, player1.name, diff);
-            poison_choice(player2, player1);
-        } <span class="kw">else </span>{
-            <span class="macro">println!</span>(<span class="string">"Égalité parfaite ! Aucun changement."</span>);
+        <span class="kw">match </span>score1.cmp(<span class="kw-2">&amp;</span>score2) {
+            std::cmp::Ordering::Greater =&gt; {
+                <span class="kw">let </span>diff = score1 - score2;
+                player2.vitality -= diff <span class="kw">as </span>i32;
+                <span class="macro">println!</span>(<span class="string">"{} gagne la manche. {} perd {} points de vitalité."</span>, player1.name, player2.name, diff);
+                poison_choice(player1, player2);
+            }
+            std::cmp::Ordering::Less =&gt; {
+                <span class="kw">let </span>diff = score2 - score1;
+                player1.vitality -= diff <span class="kw">as </span>i32;
+                <span class="macro">println!</span>(<span class="string">"{} gagne la manche. {} perd {} points de vitalité."</span>, player2.name, player1.name, diff);
+                poison_choice(player2, player1);
+            }
+            std::cmp::Ordering::Equal =&gt; {
+                <span class="macro">println!</span>(<span class="string">"Égalité parfaite ! Aucun changement."</span>);
+            }
         }
 
         <span class="kw">if </span>!player1.is_alive() || !player2.is_alive() {
@@ -160,18 +210,15 @@
 }
 
 <span class="doccomment">/// Effectue un tour de jeu : génère les objectifs, mesure le temps de réaction et calcule le score.
-</span><span class="kw">fn </span>play_turn(player: <span class="kw-2">&amp;</span>Player, n_objectives: usize) -&gt; u32 {
+</span><span class="kw">fn </span>play_turn(player: <span class="kw-2">&amp;</span>Player, n_objectives: usize) -&gt; <span class="prelude-ty">Result</span>&lt;u32, std::io::Error&gt; {
     player.display_stats();
     <span class="kw">let </span>objectives = generate_objectives(n_objectives);
     <span class="macro">println!</span>(<span class="string">"→ Objectifs : {:?}"</span>, objectives);
     <span class="macro">println!</span>(<span class="string">"→ Appuyer sur ENTREE pour démarrer le tour..."</span>);
 
-    <span class="kw">loop </span>{
-        <span class="kw">if </span>wait_for_key().is_none() {
-            <span class="kw">break</span>;
-        }
-    }
-
+    <span class="kw">while </span>wait_for_key()<span class="question-mark">? </span>!= <span class="prelude-val">None </span>{
+        <span class="comment">// continue tant que ce n'est pas None (c'est-à-dire tant que ce n'est pas Entrée)
+    </span>}
     <span class="kw">let </span>compteur = Arc::new(Mutex::new(<span class="number">0</span>));
     <span class="kw">let </span>miss = Arc::new(Mutex::new(<span class="number">0</span>));
     <span class="kw">let </span>running = Arc::new(AtomicBool::new(<span class="bool-val">true</span>));
@@ -183,7 +230,7 @@
 
     <span class="kw">let </span>handle = thread::spawn(<span class="kw">move </span>|| {
         <span class="kw">while </span>r_clone.load(Ordering::SeqCst) {
-            thread::sleep(Duration::from_millis(speed.into()));
+            thread::sleep(Duration::from_millis(speed));
             <span class="kw">let </span><span class="kw-2">mut </span>c = c_clone.lock().unwrap();
             <span class="kw-2">*</span>c += <span class="number">1</span>;
             <span class="kw">if </span><span class="kw-2">*</span>c &gt; <span class="number">100 </span>{
@@ -194,30 +241,74 @@
         }
     });
 
-    <span class="kw">let </span>key_pressed = <span class="kw">loop </span>{
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = wait_for_key() {
-            <span class="kw">break </span>c;
+    <span class="kw">loop </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw">_</span>) = wait_for_key()<span class="question-mark">? </span>{
+            <span class="kw">break</span>;
         }
-    };
+    }
 
     running.store(<span class="bool-val">false</span>, Ordering::SeqCst);
     handle.join().unwrap();
 
-    <span class="kw">let </span>score = <span class="kw-2">*</span>compteur.lock().unwrap();
-    <span class="kw">let </span>miss = <span class="kw-2">*</span>miss.lock().unwrap();
+    <span class="kw">let _ </span>= <span class="kw-2">*</span>compteur.lock().unwrap();
+    <span class="kw">let _ </span>= <span class="kw-2">*</span>miss.lock().unwrap();
 
-    <span class="kw">let </span>(cible, valeur) = objectives.iter().next().unwrap();
-    <span class="kw">if </span>key_pressed == <span class="kw-2">*</span>cible {
-        <span class="kw">let </span>diff = <span class="kw">crate</span>::utils::circular_diff(score, <span class="kw-2">*</span>valeur);
-        <span class="kw">let </span>point = calculate_score(diff, player.strength, miss);
-        <span class="macro">println!</span>(<span class="string">"→ Objectif {}:{} : Miss = {} | Compteur = {} =&gt; Score = {}"</span>, cible, valeur, miss, score, point);
-        <span class="kw">return </span>point;
-    } <span class="kw">else </span>{
-        <span class="macro">println!</span>(<span class="string">"→ Mauvaise touche {} au lieu de {} : Score = 0"</span>, key_pressed, cible);
+    <span class="kw">let </span><span class="kw-2">mut </span>total_score = <span class="number">0</span>;
+
+    <span class="kw">for </span>(<span class="kw-2">&amp;</span>cible, <span class="kw-2">&amp;</span>valeur) <span class="kw">in </span><span class="kw-2">&amp;</span>objectives {
+        <span class="macro">println!</span>(<span class="string">"→ Objectif {}:{} :"</span>, cible, valeur);
+    
+        <span class="kw">loop </span>{
+            <span class="kw">if </span>wait_for_key()<span class="question-mark">?</span>.is_none() {
+                <span class="kw">break</span>;
+            }
+        }
+    
+        <span class="kw">let </span>compteur = Arc::new(Mutex::new(<span class="number">0</span>));
+        <span class="kw">let </span>miss = Arc::new(Mutex::new(<span class="number">0</span>));
+        <span class="kw">let </span>running = Arc::new(AtomicBool::new(<span class="bool-val">true</span>));
+    
+        <span class="kw">let </span>c_clone = compteur.clone();
+        <span class="kw">let </span>m_clone = miss.clone();
+        <span class="kw">let </span>r_clone = running.clone();
+        <span class="kw">let </span>speed = player.speed;
+    
+        <span class="kw">let </span>handle = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">while </span>r_clone.load(Ordering::SeqCst) {
+                thread::sleep(Duration::from_millis(speed));
+                <span class="kw">let </span><span class="kw-2">mut </span>c = c_clone.lock().unwrap();
+                <span class="kw-2">*</span>c += <span class="number">1</span>;
+                <span class="kw">if </span><span class="kw-2">*</span>c &gt; <span class="number">100 </span>{
+                    <span class="kw-2">*</span>c = <span class="number">0</span>;
+                    <span class="kw">let </span><span class="kw-2">mut </span>m = m_clone.lock().unwrap();
+                    <span class="kw-2">*</span>m += <span class="number">1</span>;
+                }
+            }
+        });
+    
+        <span class="kw">let </span>key_pressed = <span class="kw">loop </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = wait_for_key()<span class="question-mark">? </span>{
+                <span class="kw">break </span>c;
+            }
+        };
+    
+        running.store(<span class="bool-val">false</span>, Ordering::SeqCst);
+        handle.join().unwrap();
+    
+        <span class="kw">let </span>score = <span class="kw-2">*</span>compteur.lock().unwrap();
+        <span class="kw">let </span>miss = <span class="kw-2">*</span>miss.lock().unwrap();
+    
+        <span class="kw">if </span>key_pressed == cible {
+            <span class="kw">let </span>diff = <span class="kw">crate</span>::utils::circular_diff(score, valeur);
+            <span class="kw">let </span>point = calculate_score(diff, player.strength, miss);
+            <span class="macro">println!</span>(<span class="string">"→ Objectif {}:{} : Miss = {} | Compteur = {} =&gt; Score = {}"</span>, cible, valeur, miss, score, point);
+            total_score += point;
+        } <span class="kw">else </span>{
+            <span class="macro">println!</span>(<span class="string">"→ Mauvaise touche {} au lieu de {} : Score = 0"</span>, key_pressed, cible);
+        }
     }
-
-    <span class="kw">let </span>final_score = (<span class="number">0 </span><span class="kw">as </span>f32 / n_objectives <span class="kw">as </span>f32).ceil() <span class="kw">as </span>u32;
-    <span class="macro">println!</span>(<span class="string">"→ Score moyen {}"</span>, final_score);
-    final_score
-}
-</code></pre></div></section></main></body></html>
+    
+    <span class="kw">let </span>moyenne = total_score / objectives.len().max(<span class="number">1</span>) <span class="kw">as </span>u32;
+    <span class="macro">println!</span>(<span class="string">"→ Score moyen {}"</span>, moyenne);
+    <span class="prelude-val">Ok</span>(moyenne)
+}</code></pre></div></section></main></body></html>

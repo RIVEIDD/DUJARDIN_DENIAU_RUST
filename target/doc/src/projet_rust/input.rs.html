@@ -15,17 +15,19 @@
 <a href="#14" id="14">14</a>
 <a href="#15" id="15">15</a>
 <a href="#16" id="16">16</a>
-<a href="#17" id="17">17</a></pre></div><pre class="rust"><code><span class="kw">use </span>crossterm::event::{<span class="self">self</span>, Event, KeyCode};
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a></pre></div><pre class="rust"><code><span class="kw">use </span>crossterm::event::{<span class="self">self</span>, Event, KeyCode};
 <span class="kw">use </span>std::time::Duration;
 
-<span class="doccomment">/// Attend que l'utilisateur appuie sur une touche et la retourne
-</span><span class="kw">pub fn </span>wait_for_key() -&gt; <span class="prelude-ty">Option</span>&lt;char&gt; {
+<span class="doccomment">/// Attend que l'utilisateur appuie sur une touche et retourne-la.
+/// Retourne une erreur si la lecture échoue.
+</span><span class="kw">pub fn </span>wait_for_key() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;char&gt;, std::io::Error&gt; {
     <span class="kw">loop </span>{
-        <span class="kw">if </span>event::poll(Duration::from_millis(<span class="number">10</span>)).unwrap() {
-            <span class="kw">if let </span>Event::Key(key_event) = event::read().unwrap() {
+        <span class="kw">if </span>event::poll(Duration::from_millis(<span class="number">10</span>))<span class="question-mark">? </span>{
+            <span class="kw">if let </span>Event::Key(key_event) = event::read()<span class="question-mark">? </span>{
                 <span class="kw">match </span>key_event.code {
-                    KeyCode::Char(c) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(c),
-                    KeyCode::Enter =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                    KeyCode::Char(c) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(c)),
+                    KeyCode::Enter =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
                     <span class="kw">_ </span>=&gt; {}
                 }
             }

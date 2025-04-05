@@ -3,9 +3,39 @@
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
-<a href="#5" id="5">5</a></pre></div><pre class="rust"><code><span class="doccomment">/// Calcule la distance circulaire entre deux valeurs dans [0..100]
+<a href="#5" id="5">5</a>
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a></pre></div><pre class="rust"><code><span class="doccomment">/// Calcule la distance circulaire entre deux valeurs dans [0..100]
 </span><span class="kw">pub fn </span>circular_diff(a: u32, b: u32) -&gt; u32 {
-    <span class="kw">let </span>direct = (a <span class="kw">as </span>i32 - b <span class="kw">as </span>i32).abs() <span class="kw">as </span>u32;
+    <span class="kw">let </span>direct = (a <span class="kw">as </span>i32 - b <span class="kw">as </span>i32).unsigned_abs();
     direct.min(<span class="number">100 </span>- direct)
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_circular_diff_simple() {
+        <span class="macro">assert_eq!</span>(circular_diff(<span class="number">10</span>, <span class="number">15</span>), <span class="number">5</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_circular_diff_wraparound() {
+        <span class="macro">assert_eq!</span>(circular_diff(<span class="number">95</span>, <span class="number">5</span>), <span class="number">10</span>); <span class="comment">// car on boucle à 100
+    </span>}
 }
 </code></pre></div></section></main></body></html>
